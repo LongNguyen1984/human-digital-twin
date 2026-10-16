@@ -1,0 +1,16 @@
+{
+  "name": "@hdt/api",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "API gateway: boots the kernel with the enabled plugins and mounts their routes.",
+  "dependencies": {
+    "@hdt/core": "workspace:*",
+    "@hdt/plugin-profile": "workspace:*",
+    "@hdt/plugin-tuvi": "workspace:*",
+    "@hdt/plugin-body": "workspace:*",
+    "@hdt/plugin-family": "workspace:*",
+    "@hdt/plugin-chat": "workspace:*",
+    "fastify": "^5.1.0"
+  }
+}

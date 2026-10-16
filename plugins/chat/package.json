@@ -1,0 +1,8 @@
+{
+  "name": "@hdt/plugin-chat",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Conversations: routes messages to topic plugins, runs extractors, and turns answers into facts to confirm.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@hdt/core": "workspace:*", "@hdt/plugin-profile": "workspace:*" }
+}

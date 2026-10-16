@@ -1,0 +1,21 @@
+{
+  "name": "human-digital-twin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Human Digital Twin: Tử vi, body health, family and community, built as plugins on a small core.",
+  "scripts": {
+    "dev": "tsx watch apps/api/src/main.ts",
+    "start": "tsx apps/api/src/main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "new-plugin": "node scripts/new-plugin.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "packageManager": "pnpm@10.28.0"
+}

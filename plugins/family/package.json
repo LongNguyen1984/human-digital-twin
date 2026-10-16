@@ -1,0 +1,8 @@
+{
+  "name": "@hdt/plugin-family",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Family graph: relatives (as shadow people), relations, and facts about relatives collected from chat.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@hdt/core": "workspace:*", "@hdt/plugin-profile": "workspace:*" }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "@hdt/plugin-tuvi",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Vietnamese lunar calendar and Tử vi chart engine (palaces, Cục, 14 main stars, Đại vận).",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@hdt/core": "workspace:*", "@hdt/plugin-profile": "workspace:*" }
+}

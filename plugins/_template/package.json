@@ -1,0 +1,8 @@
+{
+  "name": "@hdt/plugin-__ID__",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "__NAME__",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@hdt/core": "workspace:*", "@hdt/plugin-profile": "workspace:*" }
+}

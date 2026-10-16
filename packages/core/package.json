@@ -1,0 +1,7 @@
+{
+  "name": "@hdt/core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Plugin kernel: contracts, event bus, services, extension points, facts pipeline, consent, storage port.",
+  "exports": { ".": "./src/index.ts" }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "@hdt/plugin-profile",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "People, birth details and consent. Every other plugin builds on it.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@hdt/core": "workspace:*" }
+}

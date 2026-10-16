@@ -1,0 +1,8 @@
+{
+  "name": "@hdt/plugin-body",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Body twin: regions and organs, observations, status scores, symptom extraction and red-flag safety.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@hdt/core": "workspace:*", "@hdt/plugin-profile": "workspace:*" }
+}
