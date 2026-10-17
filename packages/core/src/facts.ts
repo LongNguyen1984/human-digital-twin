@@ -20,6 +20,12 @@ export interface FactPolicy {
 export class FactService {
   private handlers = new Map<string, FactHandler & { owner: string }>();
 
+  /**
+   * @param store - Store for facts (the kernel passes its `_facts` namespace).
+   * @param events - Bus used to emit `fact.proposed`, `fact.confirmed` and `fact.rejected`.
+   * @param consent - Checked before applying facts whose handler requires consent.
+   * @param policy - Confirmation policy. Defaults to `{ autoConfirmAt: null, minConfidence: 0.5 }`.
+   */
   constructor(
     private store: KeyValueStore,
     private events: EventBus,
@@ -27,16 +33,35 @@ export class FactService {
     private policy: FactPolicy = { autoConfirmAt: null, minConfidence: 0.5 },
   ) {}
 
+  /**
+   * Register the handler that owns a fact kind.
+   * @param owner - Id of the plugin registering the handler.
+   * @param handler - Handler for `handler.kind`.
+   * @throws Error if the kind already has an owner.
+   */
   registerHandler(owner: string, handler: FactHandler): void {
     const existing = this.handlers.get(handler.kind);
     if (existing) throw new Error(`Fact kind '${handler.kind}' already owned by '${existing.owner}'`);
     this.handlers.set(handler.kind, { ...handler, owner });
   }
 
+  /** @returns The registered fact kinds, sorted. */
   kinds(): string[] {
     return [...this.handlers.keys()].sort();
   }
 
+  /**
+   * Turn drafts into proposed facts.
+   *
+   * Drafts below `policy.minConfidence` are silently dropped. The handler's
+   * `validate` runs here, each stored fact emits `fact.proposed`, and facts at or
+   * above `policy.autoConfirmAt` are confirmed immediately (see {@link confirm}).
+   * @param drafts - Fact drafts to propose.
+   * @returns The stored facts (proposed, or confirmed when auto-confirmed), in input order.
+   * @throws {HttpError} 400 when no plugin handles a draft's kind.
+   * @throws Any error from the handler's `validate` (typically a 422 `HttpError`),
+   *   or from {@link confirm} when auto-confirming.
+   */
   async propose(drafts: FactDraft[]): Promise<Fact[]> {
     const out: Fact[] = [];
     for (const d of drafts) {
@@ -64,6 +89,11 @@ export class FactService {
     return out;
   }
 
+  /**
+   * @param id - Fact id.
+   * @returns The fact with that id.
+   * @throws {HttpError} 404 when the fact does not exist.
+   */
   async get(id: string): Promise<Fact> {
     const key = await this.store.get<string>(`id:${id}`);
     const fact = key ? await this.store.get<Fact>(key) : undefined;
@@ -71,6 +101,16 @@ export class FactService {
     return fact;
   }
 
+  /**
+   * Confirm a proposed fact: check consent, apply it through its handler, then
+   * mark it confirmed and emit `fact.confirmed`.
+   * @param id - Fact id.
+   * @param overrideValue - Optional corrected value; validated by the handler if it has `validate`.
+   * @returns The confirmed fact.
+   * @throws {HttpError} 404 when the fact does not exist.
+   * @throws {HttpError} 422 when the fact is not `proposed`.
+   * @throws {HttpError} 403 when the handler requires a consent the subject has not granted.
+   */
   async confirm(id: string, overrideValue?: unknown): Promise<Fact> {
     const fact = await this.get(id);
     if (fact.status !== 'proposed') throw unprocessable(`Fact ${id} is already ${fact.status}`);
@@ -89,6 +129,13 @@ export class FactService {
     return fact;
   }
 
+  /**
+   * Reject a proposed fact and emit `fact.rejected`.
+   * @param id - Fact id.
+   * @returns The rejected fact.
+   * @throws {HttpError} 404 when the fact does not exist.
+   * @throws {HttpError} 422 when the fact is not `proposed`.
+   */
   async reject(id: string): Promise<Fact> {
     const fact = await this.get(id);
     if (fact.status !== 'proposed') throw unprocessable(`Fact ${id} is already ${fact.status}`);
@@ -99,12 +146,18 @@ export class FactService {
     return fact;
   }
 
+  /**
+   * Facts reported by a person (not facts whose subject is that person).
+   * @param personId - Reporter (`Fact.personId`).
+   * @param status - Optional status filter.
+   * @returns Matching facts, ordered by `createdAt`.
+   */
   async list(personId: PersonId, status?: Fact['status']): Promise<Fact[]> {
     const all = await this.store.list<Fact>(`person:${personId}:`);
     return status ? all.filter((f) => f.status === status) : all;
   }
 
-  private key(f: Fact) {
+  private key(f: Fact): string {
     return `person:${f.personId}:${f.createdAt}:${f.id}`;
   }
 }
