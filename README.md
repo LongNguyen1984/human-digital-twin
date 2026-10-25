@@ -4,6 +4,8 @@ A personal "digital twin" that brings together a person's **Tử vi chart**, **b
 
 Everything except a small core is a **plugin**. A feature can be built, tested, switched on or off, and replaced without touching the others.
 
+**Documentation:** the project brief, roadmap and decision records live in [`docs/`](docs/README.md). Start with [docs/project-brief.md](docs/project-brief.md).
+
 ```bash
 pnpm install
 pnpm test        # 37 tests: kernel, lunar calendar, chart engine, parsers, end-to-end chat flow
@@ -84,20 +86,22 @@ A fact has a `personId` (who reported it) and a `subjectId` (who it's about). Th
 - **Golden tests needed:** checking full charts against a trusted reference chart is still an open task.
 - Readings are a separate extension point, `tuvi.interpreter`. The engine stays deterministic, and a rules or LLM plugin supplies the words.
 
-## Roadmap: one plugin per step
+## Roadmap
 
-| Phase | Plugin | What it adds | Depends on |
+The product is organised in three rings ([decision 0001](docs/decisions/0001-core-and-twin-rings.md)). **Core** is ASTRO-COMPANION and ships first. **Extensions** (family, body, importer) open after Gate G1, and **Platform** (devices, vector, community) after Gate G2. Core plugins never depend on outer-ring plugins. The full roadmap, with steps, gates and KPIs, is in [docs/project-brief.md §6](docs/project-brief.md#6-realigned-roadmap); this table is a summary.
+
+| Phase | Plugins | What it adds | Ring |
 |---|---|---|---|
-| ✅ 0 | core, profile, tuvi, body, family, chat, api | This repository | – |
-| 1 | `storage-postgres` | Real persistence behind `StoreDriver`, migrations | core |
-| 1 | `auth` | Sign-in, session → `actorId`, owner/relative access rules | profile |
-| 2 | `tuvi` v0.2 | Minor stars, Tứ Hóa, Tuần/Triệt, Lưu niên; golden tests | profile |
-| 2 | `importer` | CSV/Excel/JSON → column mapping → facts (same confirm flow) | profile |
-| 3 | `llm` | LLM extractor (structured JSON facts), `tuvi.interpreter`, topic fallback replies | chat, tuvi |
-| 3 | `devices` | Apple Health / Health Connect → `body.observation` facts | body |
-| 4 | `vector` | Per-domain embeddings (tuvi / life / health), weighted similarity, opt-in only (`matching` consent) | profile, tuvi, body, family |
-| 4 | `community` | Moderated rooms, anonymous handles, no auto-extraction of health data | chat, vector |
-| 5 | `web` app | The 11 designed screens, 3D viewer (React Three Fiber), dynamic chat button | API |
+| ✅ 0 | core, profile, tuvi v0.1, body, family, chat, api | This repository | – |
+| 1 | `storage-postgres`, `auth`, `privacy` | Encrypted persistence, sign-in, delete/export, audit log | Core |
+| 1 | `tuvi` v0.2, `tuvi-ontology`, golden tests | Minor stars, Tứ Hóa, Tuần/Triệt, Lưu niên; versioned ontology; expert-checked reference charts | Core |
+| 1 | `prior`, `llm` | Chart → weighted hypotheses; `tuvi.interpreter` with mandatory explanations and a language guardrail | Core |
+| 1 | `web` | Birth input, chart, chat, privacy page; 100-user pilot | Core |
+| **G1** | | All six Phase 1 KPIs met | |
+| 2 | `portrait`, `proactive`, `notifications` | Bayesian portrait, rate-limited proactive check-ins, Hybrid data tier | Core |
+| 2 | `family`, `importer` | Relationships scenario; CSV/Excel/JSON → facts | Extensions |
+| **G2** | | Hybrid tier stable, health-data impact assessment, independent ethics review | |
+| 3 | `body`, `devices`, `vector`, `community` | Health data, wearables, opt-in matching, moderated rooms | Extensions / Platform |
 
 ## Writing a plugin
 
